@@ -1,0 +1,136 @@
+<!doctype html>
+
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ログイン / 新規登録</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; line-height: 1.6; }
+    h1 { font-size: 28px; }
+    section { margin: 20px 0; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    input { padding: 6px 8px; min-width: 220px; }
+    button { padding: 8px 14px; cursor: pointer; }
+    #msg { margin-top: 16px; white-space: pre-wrap; }
+    .ok { color: #0a7a28; }
+    .err { color: #b10000; }
+    .muted { color: #666; font-size: 90%; }
+  </style>
+</head>
+<body>
+  <h1>Gemini Live Web Bot - ログイン</h1>
+
+  <section aria-labelledby="reg-title">
+    <h3 id="reg-title">新規登録</h3>
+    <div class="row">
+      <input id="rid" placeholder="ID" autocomplete="username" />
+      <input id="rpw" placeholder="パスワード" type="password" autocomplete="new-password" />
+      <input id="rname" placeholder="表示名（任意）" />
+      <button id="btnReg">登録して入る</button>
+    </div>
+    <div class="muted">※ もしサーバが bcrypt のままの場合、全角や絵文字を含む長いパスワードは 72 バイト超で失敗することがあります。</div>
+  </section>
+
+  <section aria-labelledby="login-title">
+    <h3 id="login-title">ログイン</h3>
+    <div class="row">
+      <input id="lid" placeholder="ID" autocomplete="username" />
+      <input id="lpw" placeholder="パスワード" type="password" autocomplete="current-password" />
+      <button id="btnLogin">ログイン</button>
+    </div>
+  </section>
+
+  <div id="msg" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    const $ = (id) => document.getElementById(id);
+    const msg = $("msg");
+
+    function setMessage(text, cls = ""){
+      msg.className = cls;
+      msg.textContent = text || "";
+    }
+
+    function toggleBusy(busy){
+      $("btnReg").disabled = busy;
+      $("btnLogin").disabled = busy;
+    }
+
+    const byteLen = (s) => new TextEncoder().encode(s ?? "").length;
+
+    async function postJson(url, body){
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(body)
+      });
+      const text = await r.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; } catch {}
+      if(!r.ok){
+        const detail = (data && (data.detail || data.message)) || text || `${r.status} ${r.statusText}`;
+        throw new Error(detail);
+      }
+      return data;
+    }
+
+    async function doRegister(){
+      const id = $("rid").value.trim();
+      const pw = $("rpw").value;
+      const name = $("rname").value.trim() || null;
+      if(!id || !pw){
+        setMessage("ID と パスワードを入力してください。", "err");
+        return;
+      }
+      // 参考情報としての警告（サーバ側が bcrypt の場合に備える）
+      if(byteLen(pw) > 72){
+        setMessage("注意: パスワードが 72 バイトを超えています。サーバ設定によっては登録に失敗する可能性があります。", "err");
+      } else {
+        setMessage("");
+      }
+      toggleBusy(true);
+      try{
+        setMessage("登録中…", "muted");
+        await postJson("/auth/register", { id, password: pw, display_name: name });
+        setMessage("登録に成功しました。画面を遷移します…", "ok");
+        location.href = "/";
+      }catch(e){
+        setMessage(`登録に失敗: ${e.message || e}`, "err");
+      }finally{
+        toggleBusy(false);
+      }
+    }
+
+    async function doLogin(){
+      const id = $("lid").value.trim();
+      const pw = $("lpw").value;
+      if(!id || !pw){
+        setMessage("ID と パスワードを入力してください。", "err");
+        return;
+      }
+      toggleBusy(true);
+      try{
+        setMessage("ログイン中…", "muted");
+        await postJson("/auth/login", { id, password: pw });
+        setMessage("ログインに成功しました。画面を遷移します…", "ok");
+        location.href = "/";
+      }catch(e){
+        setMessage(`ログインに失敗: ${e.message || e}`, "err");
+      }finally{
+        toggleBusy(false);
+      }
+    }
+
+    // クリック
+    $("btnReg").addEventListener("click", doRegister);
+    $("btnLogin").addEventListener("click", doLogin);
+
+    // Enter で送信（登録/ログイン）
+    ["rid","rpw","rname"].forEach(id => $(id).addEventListener("keydown", e=>{ if(e.key==="Enter") doRegister(); }));
+    ["lid","lpw"].forEach(id => $(id).addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); }));
+  </script>
+
+</body>
+</html>
