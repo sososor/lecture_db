@@ -4,36 +4,39 @@
   <meta charset="utf-8" />
   <title>Gemini Live Web Bot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="./room.css" />
-  <!-- 顔トラッキング（任意）：room.js が window.faceLandmarksDetection を参照します -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.5/dist/face-landmarks-detection.min.js"></script>
 </head>
 <body>
-  <video id="webcam" autoplay playsinline muted></video>
-  <div id="stage"></div>
+  <main class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Realtime Voice + Text</p>
+        <h1>Gemini Live Web Bot</h1>
+        <p class="lead">音声とテキストの両方で対話できる、シンプルな2DチャットUIです。</p>
+      </div>
+      <div class="controls">
+        <button id="btnConnect">🎤 接続（音声）</button>
+        <button id="btnDisconnect">切断</button>
+        <button id="btnMute" disabled>🔇 ミュート</button>
+      </div>
+    </header>
 
-  <div id="ui3d">
-    <h1>Gemini Live Web Bot</h1>
+    <section class="panel">
+      <h2>音声の部分的なテキスト（文単位）</h2>
+      <div id="log" class="log"></div>
+    </section>
 
-    <div>
-      <button id="btnConnect">🎤 接続（音声）</button>
-      <button id="btnDisconnect">切断</button>
-      <button id="btnMute" disabled>🔇 ミュート</button>
-    </div>
+    <section class="panel">
+      <h2>テキストチャット</h2>
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" placeholder="メッセージを入力" />
+        <button>送信</button>
+      </form>
+      <div id="chatArea" class="chat-area"></div>
+    </section>
+  </main>
 
-    <h3>音声の部分的なテキスト（文単位）</h3>
-    <div id="log"></div>
-
-    <h3>テキストチャット</h3>
-    <form id="chatForm">
-      <input id="chatInput" placeholder="メッセージを入力" size="40" />
-      <button>送信</button>
-    </form>
-    <div id="chatArea"></div>
-  </div>
-
-  <script type="module" src="./room.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

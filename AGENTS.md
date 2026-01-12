@@ -1,50 +1,38 @@
 # AGENTS.md
 
 ## 目的
-データベースの整合性を強化するため、外部キー制約を導入し、全ての DB 操作を明示的なトランザクションで実行する（autocommit を無効化）。
+このリポジトリ（/app = web-bot）から **3DルームUI / アバター表示 / Webカメラの顔トラッキング** 機能だけを削除し、
+音声・テキストチャットのUIは通常の2Dページとして残す。
 
-## 現状（要点）
-- `ConnectionPool` が `autocommit=True` のため、各クエリが即時コミットされる。
-- `chat_logs.user_id` は `users.id` への参照制約が無い。
-- 複数クエリで構成される処理でも、ロールバック境界が明示されていない。
+## 変更範囲（必須）
+### 1) 3DルームUI / アバター表示の除去
+- `frontend/index.html` から `room.js` の読み込みを削除する。
+- `frontend/room.js` は不要なので削除する（または読み込まない前提で空にする）。
+- 3D用DOM（`#stage`, `#ui3d`）を廃止し、UIは通常のHTML構造にする。
 
-## ゴール
-- `chat_logs.user_id` に FOREIGN KEY を追加し、ユーザー削除時の扱いを明確化。
-- autocommit を停止し、各 DB 操作を `with con.transaction():` で実行する。
-- 失敗時はロールバックされ、部分的な更新が残らない。
+### 2) Webカメラ顔トラッキングの除去
+- `frontend/index.html` から以下を削除する。
+  - `<video id="webcam">`
+  - `@tensorflow/tfjs` と `face-landmarks-detection` の `<script>`
+- `getUserMedia` を呼ぶ顔トラッキング処理が残らないことを確認する。
+  - マイク用 `getUserMedia({ audio: true })` は残す。
 
-## 変更対象
-- `backend/main.py`（DB 初期化・CRUD・RAG ingest など）
-- 必要なら `README.md`（運用上の注意点を追記）
+### 3) CSSの整理
+- `frontend/room.css` は3D専用のため、
+  - 削除して新しいUI用CSSを用意する、または
+  - 2D UIのためのスタイルに置き換える。
+- `#stage`, `#webcam`, `canvas`, `#ui3d` など3D専用スタイルは削除する。
 
-## 実装方針
-### 1) autocommit 停止 + 共通トランザクションヘルパ
-- `ConnectionPool(..., kwargs={"autocommit": True})` を削除するか `False` に変更。
-- トランザクション管理を統一するため、共通ヘルパを用意する。
-  - 例: `_db()` / `_with_tx()` を定義し、`with pool.connection() as con: with con.transaction():` を必ず通す。
-- DB への全アクセスはこのヘルパ経由で行う。
+### 4) 付随ドキュメントの更新
+- `frontend/assets/README.md` にあるVRM/アバター案内は削除またはファイル削除。
+- READMEに3D/アバター/顔トラッキングの記述があれば更新する。
 
-### 2) FOREIGN KEY 追加（idempotent に）
-- `chat_logs` 作成後に FK を追加する。
-- Postgres には `ADD CONSTRAINT IF NOT EXISTS` が無いので、`DO $$ BEGIN ... END $$;` で存在確認を行う。
-- 推奨例:
-  - `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
-  - ログを残したい場合は `ON DELETE RESTRICT` / `NO ACTION` に変更。
+## 影響確認（最低限）
+- ページ読み込み時に **カメラ許可ダイアログが出ない**。
+- コンソールに `room.js` 未ロードや `THREE` 参照エラーが出ない。
+- UI（接続/切断/ミュート、ログ、チャット入力）が画面内で操作できる。
+- 音声/テキスト機能（`frontend/app.js`）が動作する。
 
-### 3) 既存データの整合
-- 既存データに不整合があると FK 追加で失敗するため、事前に整理する。
-  - 例: `DELETE FROM chat_logs WHERE user_id NOT IN (SELECT id FROM users);`
-- 段階適用したい場合は `NOT VALID` で追加 → データ整理 → `VALIDATE CONSTRAINT`。
-
-### 4) トランザクション化する処理の範囲
-- 1回の処理で複数クエリが走る箇所は **同一 connection + 同一 transaction** にまとめる。
-  - `_init_db`（DDL + index + RAG schema）
-  - `append_log`, `read_tail`, `_purge_chat_logs`
-  - 認証系（register/login）での SELECT/INSERT
-  - RAG ingest / ロード（`_ingest_rag_vectors`, `_load_rag_cache_from_db`）
-- 既存の「事前チェック→INSERT」の流れは同一トランザクション内で実行し、競合時は UNIQUE 制約のエラー処理を追加する。
-
-## 動作確認
-- 起動後に `\d chat_logs` で FK が付与されていること。
-- 例外発生時に partial insert が残らないこと（rollback を確認）。
-- 登録/ログ保存/RAG ingest が従来通り動作すること。
+## 触らない領域
+- バックエンド（`/app/backend`）のAPI実装は変更しない。
+- 音声・テキストチャットのロジックは維持する。
