@@ -1,0 +1,58 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: webbot
+      POSTGRES_PASSWORD: webbot
+      POSTGRES_DB: webbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webbot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  voicevox:
+    image: voicevox/voicevox_engine:cpu-latest
+    container_name: voicevox_engine
+    restart: unless-stopped
+    # 外からも Swagger UI などにアクセスしたい場合は公開しておく
+    ports:
+      - "50021:50021"
+    # モデルなどのキャッシュを永続化したい場合はコメントアウトを外す
+    # volumes:
+    #   - ./voicevox_resources:/var/lib/voicevox
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # 必要に応じて .env やシェルから渡してください
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash-native-audio-preview-12-2025}
+      GEMINI_TEXT_MODEL: ${GEMINI_TEXT_MODEL:-gemini-2.0-flash}
+      DATABASE_URL: postgresql://webbot:webbot@db:5432/webbot
+      SESSION_SECRET: ${SESSION_SECRET:-dev-secret-change-me}
+      CODEX_HOME: /root/.codex
+      # ★ VOICEVOX コンテナをサービス名で参照
+      VOICEVOX_URL: http://voicevox:50021
+    # Linux 環境でも host.docker.internal を使えるようにする
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+      voicevox:
+        condition: service_started
+    ports:
+      - "8001:8000"
+    volumes:
+      - .:/app
+      - ${HOME}/.codex:/root/.codex
+
+volumes:
+  db-data:

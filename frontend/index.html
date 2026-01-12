@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Gemini Live Web Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./room.css" />
+  <!-- 顔トラッキング（任意）：room.js が window.faceLandmarksDetection を参照します -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.5/dist/face-landmarks-detection.min.js"></script>
+</head>
+<body>
+  <video id="webcam" autoplay playsinline muted></video>
+  <div id="stage"></div>
+
+  <div id="ui3d">
+    <h1>Gemini Live Web Bot</h1>
+
+    <div>
+      <button id="btnConnect">🎤 接続（音声）</button>
+      <button id="btnDisconnect">切断</button>
+      <button id="btnMute" disabled>🔇 ミュート</button>
+    </div>
+
+    <h3>音声の部分的なテキスト（文単位）</h3>
+    <div id="log"></div>
+
+    <h3>テキストチャット</h3>
+    <form id="chatForm">
+      <input id="chatInput" placeholder="メッセージを入力" size="40" />
+      <button>送信</button>
+    </form>
+    <div id="chatArea"></div>
+  </div>
+
+  <script type="module" src="./room.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
