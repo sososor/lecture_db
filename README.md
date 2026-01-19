@@ -99,6 +99,16 @@ AWS公式ドキュメントは網羅性が高いため、これのドキュメ�
 DB は pgvector 拡張が必要です（`docker-compose.yml` は pgvector 搭載イメージを使用）。
 
 
+### 主な環境変数
+- `RAG_TEXTS_PATH`（必須: vectors と同件数のテキスト）
+- `RAG_EMBED_MODEL`（既定: `text-embedding-004`）
+- `RAG_FORCE_RELOAD`（`1` で再取り込み）
+- `RAG_VECTOR_MODE`（`sql`|`memory`）
+- `RAG_VECTOR_DIM`（埋め込み次元を明示する場合）
+- `RAG_VECTOR_INDEX`（`hnsw`|`ivfflat`|`none`）
+- `RAG_CACHE_IN_MEMORY`（SQLモード時は `0` 推奨）
+
+
 ## チーム開発方法
 GithubのKanbanボードを使い、タスクを設定し、進めた  
 
@@ -108,14 +118,3 @@ GithubのKanbanボードを使い、タスクを設定し、進めた
 
 
 
-
-
-
-### 主な環境変数
-- `RAG_TEXTS_PATH`（必須: vectors と同件数のテキスト）
-- `RAG_EMBED_MODEL`（既定: `text-embedding-004`）
-- `RAG_FORCE_RELOAD`（`1` で再取り込み）
-- `RAG_VECTOR_MODE`（`sql`|`memory`）
-- `RAG_VECTOR_DIM`（埋め込み次元を明示する場合）
-- `RAG_VECTOR_INDEX`（`hnsw`|`ivfflat`|`none`）
-- `RAG_CACHE_IN_MEMORY`（SQLモード時は `0` 推奨）
