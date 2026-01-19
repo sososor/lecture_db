@@ -1,0 +1,19 @@
+fastapi==0.115.*
+python-multipart==0.0.*
+pymupdf==1.24.*
+uvicorn[standard]==0.32.*
+itsdangerous==2.*
+google-genai==1.*          # bot.pyと同系
+aiohttp==3.*
+numpy==2.*
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.*
+
+# 認証用（Passlib と bcrypt の相性問題回避のため bcrypt を 4.0.1 に固定）
+
+passlib[bcrypt]==1.7.*
+bcrypt==4.0.1               # 5.x だと passlib 1.7 系の自己テストと衝突し 500 になるため固定
+psycopg[binary,pool]==3.2.* # PostgreSQLクライアントとコネクションプール（バイナリ版でビルド不要）
+pgvector==0.3.*             # pgvector型の利用（SQLベクトル検索）
+PyMuPDF
+
