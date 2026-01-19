@@ -106,14 +106,9 @@ GithubのKanbanボードを使い、タスクを設定し、進めた
 現在は **pgvector によるSQL検索（`RAG_VECTOR_MODE=sql`）** が既定です。  
 DB は pgvector 拡張が必要です（`docker-compose.yml` は pgvector 搭載イメージを使用）。
 
-### 使い方（最低限）
-1. `vectors.pt` をリポジトリ直下に配置（既定パス: `/app/vectors.pt`）
-2. 対応するテキストを `rag_texts.jsonl` などに用意し、`RAG_TEXTS_PATH` で指定  
-   - 1行1JSONの形式で、`text`（本文）と任意の `metadata` を持つ想定
-3. `.env` などで `RAG_TEXTS_PATH` と `RAG_EMBED_MODEL` を設定
+
 
 ### 主な環境変数
-- `RAG_VECTORS_PATH`（既定: `/app/vectors.pt`）
 - `RAG_TEXTS_PATH`（必須: vectors と同件数のテキスト）
 - `RAG_EMBED_MODEL`（既定: `text-embedding-004`）
 - `RAG_FORCE_RELOAD`（`1` で再取り込み）
