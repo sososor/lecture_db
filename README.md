@@ -91,6 +91,14 @@ AWS公式ドキュメントは網羅性が高いため、これのドキュメ�
 ### chat_logs
 - FK user_id
 
+
+
+## ベクトルRAG
+アップロードされたPDFをベクトル化し、PDFの内容をベクトル化したデータとchunk化したテキストデータをDBに保存し、テキストチャット時に関連情報を検索してプロンプトへ注入します。  
+現在は **pgvector によるSQL検索（`RAG_VECTOR_MODE=sql`）** が既定です。  
+DB は pgvector 拡張が必要です（`docker-compose.yml` は pgvector 搭載イメージを使用）。
+
+
 ## チーム開発方法
 GithubのKanbanボードを使い、タスクを設定し、進めた  
 
@@ -100,10 +108,6 @@ GithubのKanbanボードを使い、タスクを設定し、進めた
 
 
 
-## ベクトルRAG
-アップロードされたPDFをベクトル化し、PDFの内容をベクトル化したデータとchunk化したテキストデータをDBに保存し、テキストチャット時に関連情報を検索してプロンプトへ注入します。  
-現在は **pgvector によるSQL検索（`RAG_VECTOR_MODE=sql`）** が既定です。  
-DB は pgvector 拡張が必要です（`docker-compose.yml` は pgvector 搭載イメージを使用）。
 
 
 
