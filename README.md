@@ -42,6 +42,7 @@ AWS公式ドキュメントは網羅性が高いため、これのドキュメ�
 ・外部情報をPDF形式でアップロード可能且つアップロードされたPDFの内容をベクトル化してDB保存。  
 ・チャットログの表示。  
 
+```
 .
 ├── AGENTS.md
 ├── Dockerfile
@@ -61,7 +62,7 @@ AWS公式ドキュメントは網羅性が高いため、これのドキュメ�
 ├── index.html
 ├── pcm-worklet.js
 └── room.css
-
+```
 
 ## デモ動画
 [![Demo Video](https://img.youtube.com/vi/AFXqn3MlxAA/0.jpg)](https://www.youtube.com/watch?v=AFXqn3MlxAA)
