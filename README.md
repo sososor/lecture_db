@@ -101,7 +101,7 @@ GithubのKanbanボードを使い、タスクを設定し、進めた
 
 
 ## ベクトルRAG（vectors.pt）
-`/vectors.pt` に保存された埋め込みをPostgreSQLへ取り込み、テキストチャット時に関連情報を検索してプロンプトへ注入します。  
+アップロードされたPDFをベクトル化し、PDFの内容をベクトル化したデータとchunk化したテキストデータをDBに保存し、テキストチャット時に関連情報を検索してプロンプトへ注入します。  
 現在は **pgvector によるSQL検索（`RAG_VECTOR_MODE=sql`）** が既定です。  
 DB は pgvector 拡張が必要です（`docker-compose.yml` は pgvector 搭載イメージを使用）。
 
