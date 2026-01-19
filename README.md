@@ -2,113 +2,101 @@
 
 *開発途中のプロジェクトです。
 
-##ペルソナ
+## ペルソナ
 N,S
 
+ペルソナ（例）  
+属性：AWSを学習中の大学生  
 
-ペルソナ（例）​
-属性：AWSを学習中の大学生​​
+状況：  
+AWSに興味があるものの、学ぶべき内容が多く、AWSの公式ドキュメントなどを読んで逐一情報を得たいが、分量が多く億劫に感じている。AIの回答には正確性を求めたい。  
 
-状況：​
-AWSに興味があるものの、学ぶべき内容が多く、AWSの公式ドキュメントなどを読んで逐一情報を得たいが、分量が多く億劫に感じている。AIの回答には正確性を求めたい。​
+目的：  
+ドキュメントを辞書的な使い方で使いたいので、“今知りたい答え” を短時間で得たい。重要ポイントをわかりやすい表現で解説してほしい。  
 
-目的：​
-ドキュメントを辞書的な使い方で使いたいので、“今知りたい答え” を短時間で得たい。重要ポイントをわかりやすい表現で解説してほしい。​
-​
-困りごと：​
-キーワード検索だと 該当箇所が多すぎる or 見つからない​
-英語/専門用語が多く、理解に時間がかかる​​
+困りごと：  
+・キーワード検索だと 該当箇所が多すぎる or 見つからない  
+・英語/専門用語が多く、理解に時間がかかる  
 
-##ストーリーボード
-手早くAWSの学習を行いたいが、やり方を巡って困っている。​
-AWS公式ドキュメントは網羅性が高いため、これのドキュメントを辞書のように用いながら学習したいものの、英語で書かれている他、分量が多く、とても自力では学習が捗らない。​
+## ストーリーボード
+手早くAWSの学習を行いたいが、やり方を巡って困っている。  
+AWS公式ドキュメントは網羅性が高いため、これのドキュメントを辞書のように用いながら学習したいものの、英語で書かれている他、分量が多く、とても自力では学習が捗らない。  
 
-##アプリの概要
-解決したい課題​
-・長文ドキュメントから「必要な部分」を探すのに時間がかかる​
-・理解に必要な前提/用語が多く、学習コストが高い​​
-・調べた内容が分散し、同じ調査を繰り返してしまう​
+## アプリの概要
+### 解決したい課題
+・長文ドキュメントから「必要な部分」を探すのに時間がかかる  
+・理解に必要な前提/用語が多く、学習コストが高い  
+・調べた内容が分散し、同じ調査を繰り返してしまう  
 
-​
-提案する解決策：テキストチャットボット​
-・自然文で質問 → 要点を整理して回答​
-・外部情報を参照して回答品質を安定化​
+### 提案する解決策：テキストチャットボット
+・自然文で質問 → 要点を整理して回答  
+・外部情報を参照して回答品質を安定化  
 
-
-##システム構成
+## システム構成
 ![System Architecture](System%20Architecture.png)
 
+## アプリ構成、フォルダ構成
+### 主な機能
+・ユーザー登録 / ログイン / ログアウト（セッションベース）  
+・テキストチャット（生成AI）  
+・会話履歴のDB保存  
+・RAG：ナレッジを検索して回答に反映（ベクトル検索）  
+・外部情報をPDF形式でアップロード可能且つアップロードされたPDFの内容をベクトル化してDB保存。  
+・チャットログの表示。  
 
-##アプリ構成、フォルダ構成
-主な機能​
-ユーザー登録 / ログイン / ログアウト（セッションベース）​​
-テキストチャット（生成AI）​​
-会話履歴のDB保存​
-RAG：ナレッジを検索して回答に反映（ベクトル検索）​
-外部情報をPDF形式でアップロード可能且つアップロードされたPDFの内容をベクトル化してDB保存。​​
-チャットログの表示。​
+.
+├── AGENTS.md
+├── Dockerfile
+├── LICENSE
+├── README.md
+├── backend
+│ ├── main.py
+│ └── requirements.txt
+├── docker-compose.yml
+├── extracted_text.txt
+└── frontend
+├── app.js
+├── assets
+│ └── README.md
+├── auth.html
+├── bus.js
+├── index.html
+├── pcm-worklet.js
+└── room.css
 
-.​
-├── AGENTS.md​
-├── Dockerfile​
-├── LICENSE​
-├── README.md​
-├── backend​
-│   ├── main.py​
-│   └── requirements.txt​
-├── docker-compose.yml​
-├── extracted_text.txt​
-└── frontend​
-    ├── app.js​
-    ├── assets​
-    │   └── README.md​
-    ├── auth.html​
-    ├── bus.js​
-    ├── index.html​
-    ├── pcm-worklet.js​
-    └── room.css​
 
-​
-​
-​
-##デモ動画
+## デモ動画
 [![Demo Video](https://img.youtube.com/vi/AFXqn3MlxAA/0.jpg)](https://www.youtube.com/watch?v=AFXqn3MlxAA)
 
+## DB構成（外部、トランザクション、ER図）
 
+### users
+- PK id (text)
+- pw_hash
+- display_name
+- created_at
 
-##DB構成（外部、トランザクション、ER図）
-users                 ​
-PK id (text)  ​
-pw_hash  ​
-display_name ​
-created_at    ​
+### rag_docs
+- PK id (bigint)
+- FK user_id
+- created_at
 
- 
-rag_docs  ​
-PK id (bigint) ​
-FK user_id​
-created_at ​
+### rag_chunks
+- PK id (bigint)
+- idx
+- content
+- metadata (jsonb)
+- embedding (vector(768))
+- user_id
+- doc_id
 
+### chat_logs
+- FK user_id
 
- 
-rag_chunks   ​
-PK id (bigint)     ​
-idx                        ​
-content                    ​
-metadata (jsonb) ​
-embedding (vector(768)) ​
-user_id​
-doc_id    
+## チーム開発方法
+GithubのKanbanボードを使い、タスクを設定し、進めた  
 
- 
-chat_logs ​
-FK user_id  
-​
-​
-##チーム開発方法
-GithubのKanbanボードを使い、タスクを設定し、進めた​
-
-ディスコードで通話及びチャットでやり取り​
+ディスコードで通話及びチャットでやり取り  
 
 アプリはCODEX CLI(OpenAI)で作成
 
