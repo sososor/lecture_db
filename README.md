@@ -33,8 +33,8 @@ AWS公式ドキュメントは網羅性が高いため、これのドキュメ�
 ## システム構成
 ![System Architecture](System%20Architecture.png)
 
-##インフラ構成図
-![Infrastructure Architecture].(Infrastructure%20Architecture.png)
+## インフラ構成図
+![Infrastructure Architecture](Infrastructure%20Architecture.png)
 
 ## アプリ構成、フォルダ構成
 ### 主な機能
